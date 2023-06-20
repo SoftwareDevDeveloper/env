@@ -4,7 +4,7 @@ default_tags = {
   "Name"  = "Marketing Department Machine SIT"
   "owner" = "Mr Jones"
   "status" = "Non-critical"
-  "created_by" = "Admin Team"
-  "weekendshutdown" = "Probably"
+  "created_by" = "Admin and IT Team"
+  "weekendshutdown" = "Maybe Yes"
 
 }
