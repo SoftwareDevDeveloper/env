@@ -1,11 +1,9 @@
 pipeline {
-    agent any
+    agent any 
+
     parameters {
-        choice (name: "TARGET_ENV", 
-        choices: ["DEV", "SIT", "STAGING", "PRE-PROD", "PROD"], 
-        description:"Select Target Deplyment Environment")
+        choice (name: 'AWS_ENV', choices: 'dev\nsit', description: 'implementation stage')
     }
-    
     environment {
         AWS_ACCESS_KEY_ID = credentials ('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials ('AWS_SECRET_ACCESS_KEY')
@@ -14,28 +12,26 @@ pipeline {
     stages {
         stage ("download code and env config") {
             steps {
-                sh 'git clone https://github.com/SoftwareDevDeveloper/codebase.git '
-                sh 'git clone https://github.com/SoftwareDevDeveloper/env.git '
+                echo "${params.AWS_ENV}"
+                sh 'git clone https://github.com/techbleat/codebase.git'
+                sh 'git clone https://github.com/techbleat/env.git'
             }
         }
-        
-        stage ('Implement plan') {
-            steps {
+        stage ('plan') {
+             steps {
                 sh '''
                    cd codebase
-                   terraform init -backend-config=../env/dev/backend.tfvars
-                   terraform plan -var-file ../env/dev/backend.tfvars  -var-file ../env/dev/ec2.tfvars
+                   terraform init -backend-config=../env/"${AWS_ENV}"/backend.tfvars
+                   terraform plan -var-file ../env/"${AWS_ENV}"/backend.tfvars  -var-file ../env/"${AWS_ENV}"/ec2.tfvars 
                 '''
-                
-                script {
+                script  {
                     env.NEXT_STEP = input message: 'Implement plan?', ok: 'Implement',
-                    parameters: [choice (name: 'Implement', choices: 'Apply\nDestroy\nDo nothing', 
-                    description: 'This is Implementation stage')]
+                    parameters: [choice (name: 'Implement', choices: 'apply\ndestroy\ndo nothing', description: 'implementation stage')]
                 }
-            }
-        }
+            }   
 
-        stage ('Implement apply') {
+        }
+        stage ('implement apply') {
             when {
                 expression {
                     env.NEXT_STEP == 'apply'
@@ -44,8 +40,22 @@ pipeline {
             steps {
                 sh '''
                    cd codebase
-                   terraform init -backend-config=../env/dev/backend.tfvars
-                   terraform apply -var-file ../env/dev/backend.tfvars  -var-file ../env/dev/ec2.tfvars -auto-approve
+                   terraform init -backend-config=../env/"${AWS_ENV}"/backend.tfvars
+                   terraform apply -var-file ../env/"${AWS_ENV}"/backend.tfvars  -var-file ../env/"${AWS_ENV}"/ec2.tfvars -auto-approve
+                '''
+            }
+        }
+        stage ('implement destroy') {
+            when {
+                expression {
+                    env.NEXT_STEP == 'destroy'
+                }
+            }
+            steps {
+                sh '''
+                   cd codebase
+                   terraform init -backend-config=../env/"${AWS_ENV}"/backend.tfvars
+                   terraform destroy -var-file ../env/"${AWS_ENV}"/backend.tfvars  -var-file ../env/"${AWS_ENV}"/ec2.tfvars -auto-approve
                 '''
             }
         }
