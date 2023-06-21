@@ -5,6 +5,6 @@ default_tags = {
   "owner" = "Mr Jones"
   "status" = "Non-critical"
   "created_by" = "Admin Team"
-  "weekendshutdown" = "Probably"
+  "weekendshutdown" = "Waiting confirmation"
 
 }
