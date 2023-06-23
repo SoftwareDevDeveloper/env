@@ -21,6 +21,7 @@ pipeline {
         stage ('plan') {
              steps {
                 helloWorld()
+                
                 script  {
                     env.NEXT_STEP = input message: 'Implement plan?', ok: 'Implement',
                     parameters: [choice (name: 'Implement', choices: 'apply\ndestroy\ndo nothing', description: 'implementation stage')]
