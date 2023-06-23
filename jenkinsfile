@@ -1,3 +1,4 @@
+@Library("my-jenkins-shared-library") _
 pipeline {
 
     agent any 
@@ -14,7 +15,7 @@ pipeline {
         stage ("download code and env config") {
             steps {
                 sh 'git clone https://github.com/SoftwareDevDeveloper/codebase.git'
-                sh 'git clone https://github.com/SoftwareDevDeveloper/env.git'
+                helloWorld()
             }
         }
         stage ('plan') {
