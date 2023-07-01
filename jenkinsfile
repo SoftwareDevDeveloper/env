@@ -2,7 +2,7 @@ pipeline {
 
     agent any 
     parameters {
-        choice (name: "TARGET_ENV", choices: ["dev", "sit", "prod"], description: "Target Deployment Environment")
+        choice (name: "TARGET_ENV", choices: ["dev", "sit", "staging", "prod"], description: "Target Deployment Environment")
     }
 
     environment {
@@ -52,7 +52,6 @@ pipeline {
                 '''
             }
         }
-    }
     
     post {
         always {
